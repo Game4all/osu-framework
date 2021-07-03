@@ -18,6 +18,7 @@ using osu.Framework.Utils;
 using osu.Framework.Text;
 using osuTK;
 using osuTK.Graphics;
+using System.Globalization;
 
 namespace osu.Framework.Graphics.Sprites
 {
@@ -124,6 +125,19 @@ namespace osu.Framework.Graphics.Sprites
         }
 
         private string displayedText => localisedText?.Value ?? text.ToString();
+
+        private TextTransform textTransform = TextTransform.None;
+
+        public TextTransform TextTransform
+        {
+            get => textTransform;
+            set
+            {
+                textTransform = value;
+
+                invalidate(true);
+            }
+        }
 
         private FontUsage font = FontUsage.Default;
 
@@ -473,7 +487,7 @@ namespace osu.Framework.Graphics.Sprites
                 TextBuilder textBuilder = getTextBuilder();
 
                 textBuilder.Reset();
-                textBuilder.AddText(displayedText);
+                textBuilder.AddText(getTransformedText());
                 textBounds = textBuilder.Bounds;
             }
             finally
@@ -625,6 +639,26 @@ namespace osu.Framework.Graphics.Sprites
             return textBuilderCache.Value;
         }
 
+        //todo: use current LocalisationManager effective culture.
+        private string getTransformedText()
+        {
+            switch (textTransform)
+            {
+                case TextTransform.Uppercased:
+                    return displayedText.ToUpper();
+
+                case TextTransform.Capitalized:
+                    return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(displayedText);
+
+                case TextTransform.Lowercase:
+                    return displayedText.ToLower();
+
+                case TextTransform.None:
+                default:
+                    return displayedText;
+            }
+        }
+
         public override string ToString() => $@"""{displayedText}"" " + base.ToString();
 
         /// <summary>
@@ -641,7 +675,7 @@ namespace osu.Framework.Graphics.Sprites
                 if (string.IsNullOrEmpty(displayedText))
                     return 0;
 
-                return store.GetBaseHeight(displayedText[0]).GetValueOrDefault() * Font.Size;
+                return store.GetBaseHeight(getTransformedText()[0]).GetValueOrDefault() * Font.Size;
             }
         }
 
