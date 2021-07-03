@@ -18,6 +18,8 @@ namespace osu.Framework.Localisation
         private readonly Bindable<string> configLocale;
         private readonly Bindable<ILocalisationStore?> currentStorage = new Bindable<ILocalisationStore?>();
 
+        public ILocalisationStore? CurrentStore => currentStorage.Value;
+
         public LocalisationManager(FrameworkConfigManager config)
         {
             preferUnicode = config.GetBindable<bool>(FrameworkSetting.ShowUnicode);

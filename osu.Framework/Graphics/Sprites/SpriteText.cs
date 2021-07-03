@@ -639,19 +639,20 @@ namespace osu.Framework.Graphics.Sprites
             return textBuilderCache.Value;
         }
 
-        //todo: use current LocalisationManager effective culture.
         private string getTransformedText()
         {
+            var culture = localisation.CurrentStore?.EffectiveCulture ?? CultureInfo.InvariantCulture;
+
             switch (textTransform)
             {
                 case TextTransform.Uppercased:
-                    return displayedText.ToUpper();
+                    return displayedText.ToUpper(culture);
 
                 case TextTransform.Capitalized:
-                    return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(displayedText);
+                    return culture.TextInfo.ToTitleCase(displayedText);
 
                 case TextTransform.Lowercase:
-                    return displayedText.ToLower();
+                    return displayedText.ToLower(culture);
 
                 case TextTransform.None:
                 default:
